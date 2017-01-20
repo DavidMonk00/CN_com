@@ -1,4 +1,4 @@
-gcc -W -fPIC -std=c99 -o main.o olso.c -lm
+gcc -fPIC -W -std=c99 -o main.o oslo.c
 echo "Complilation complete. Running program:"
 time ./main.o
 #python sor.py $3
