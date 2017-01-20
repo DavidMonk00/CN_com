@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef struct {
    int L;
@@ -87,11 +88,18 @@ int relax(System* system) {
    return s;
 }
 
-void writeFile(int* array, int length) {
+void writeFile(int* array, int length, int L, int avalanche) {
    time_t t = time(NULL);
    struct tm *tm = localtime(&t);
    char s[64];
-   strftime(s, sizeof(s), "./data/%Y%m%d%H%M%S.dat", tm);
+   strftime(s, sizeof(s), "./data/%Y%m%d%H%M%S", tm);
+   char ext[64];
+   if (avalanche) {
+      sprintf(ext, "_avalanche_%d.dat",L);
+   } else {
+      sprintf(ext, "_height_%d.dat",L);
+   }
+   strcat(s,ext);
    FILE* f = fopen(s, "w");
    if (f == NULL) {
       printf("Error opening file.");
@@ -103,25 +111,29 @@ void writeFile(int* array, int length) {
    }
    fprintf(f, "\n");
    fclose(f);
-
 }
 
 int main(int argc, char** argv) {
    srand(time(NULL));
    System system;
    system.L = atoi(argv[1]);
-   int n = atoi(argv[2]);
+   int n = (int)atof(argv[2]);
    system.p = 0.5;
    system.array_slope = createintArray(system.L);
    system.array_threshold = generateThresholdArray(system.L, system.p);
    int* height = createintArray(n);
+   int* avalanches = createintArray(n);
    for (int i = 0; i < n; i++) {
+      if (i % (n/100) == 0) {
+         printf("%0.0f%%\n", ((float)i/(float)n)*100);
+      }
       drive(&system);
-      relax(&system);
-         height[i] = h;
+      avalanches[i] = relax(&system);
+      height[i] = h;
    }
-   writeFile(height, n);
-
+   writeFile(height, n, system.L, 0);
+   writeFile(avalanches, n, system.L, 1);
+   
    free(system.array_slope);
    free(system.array_threshold);
    return 0;
