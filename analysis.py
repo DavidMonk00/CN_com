@@ -58,7 +58,7 @@ class Height:
         plt.ylabel('t^a F(t/(L^D)) - a=%0.2f, D=%0.2f'%(t,D))
         plt.xlabel('t/(L^D)')
         plt.legend(loc=0)
-        #plt.show()
+        plt.show()
 
 
 
