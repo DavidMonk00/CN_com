@@ -50,16 +50,14 @@ class Height:
             for j in xrange(l):
                 if (self.data_average[i][j] != 0):
                     y[i][j] = pow(j,t)*self.data_average[i][j]
-        plt.rc('text', usetex=True)
-        plt.rc('font', family='serif')
         for i in range(len(y)):
             L = pow(2,i+3)
             x = self.w*np.arange(1,l+1,1)/pow(L,D)
             plt.plot(x,y[i], label='L = %d'%L)
         plt.xscale('log')
         plt.yscale('log')
-        plt.ylabel('t^a F(t/(L^D)) - a=%0.2f, D=%0.2f'%(t,D))
-        plt.xlabel(r'$\frac{t}{L^D}$')
+        plt.ylabel(r'$t^{-\tau_t}F\left(t/L^D\right)$')
+        plt.xlabel(r"$t/L^D$")
         plt.legend(loc=0)
         plt.show()
 
