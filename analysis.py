@@ -23,7 +23,7 @@ class Height:
             for j in xrange(w,l-w-1,w):
                 self.data_average[i][j/w] = np.sum(self.data[i][j-w:j+w+1])/(2*w+1) #+1 to include fencepost
         self.averaged = True
-        np.savetxt('./data/'+self.filename[-4]+'_averaged.dat',self.data_average)
+        np.savetxt('./data/'+self.filename[:-4]+'_averaged.dat',self.data_average)
         print 'Averaged data generated.'
     def plot(self,data):
         if (data == 'raw'):
