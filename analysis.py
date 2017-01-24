@@ -23,7 +23,7 @@ class Height:
             for j in xrange(w,l-w-1,w):
                 self.data_average[i][j/w] = np.sum(self.data[i][j-w:j+w+1])/(2*w+1) #+1 to include fencepost
         self.averaged = True
-        np.savetxt('./data/'+self.filename[:-4]+'_averaged.dat',self.data_average)
+        np.savetxt('./data/'+self.filename[:-4]+'_averaged.dat',np.transpose(self.data_average))
         print 'Averaged data generated.'
     def plot(self,data):
         if (data == 'raw'):
@@ -50,6 +50,8 @@ class Height:
             for j in xrange(l):
                 if (self.data_average[i][j] != 0):
                     y[i][j] = pow(j,t)*self.data_average[i][j]
+        plt.rc('text', usetex=True)
+        plt.rc('font', family='serif')
         for i in range(len(y)):
             L = pow(2,i+3)
             x = self.w*np.arange(1,l+1,1)/pow(L,D)
@@ -57,7 +59,7 @@ class Height:
         plt.xscale('log')
         plt.yscale('log')
         plt.ylabel('t^a F(t/(L^D)) - a=%0.2f, D=%0.2f'%(t,D))
-        plt.xlabel('t/(L^D)')
+        plt.xlabel(r'$\frac{t}{L^D}$')
         plt.legend(loc=0)
         plt.show()
 
