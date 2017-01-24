@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
+#include <pthread.h>
 
 typedef struct {
    int L;
    float p;
    int* array_slope;
    int* array_threshold;
+   int h;
 } System;
 
 typedef struct {
@@ -17,7 +18,11 @@ typedef struct {
    int** avalanches;
 } Results;
 
-int h = 0;
+typedef struct {
+   System system;
+   int n;
+   Results* res;
+} InitParams;
 
 int* createintArray(int length) {
    int* array;
@@ -46,7 +51,7 @@ int* generateThresholdArray(int length, float probability) {
 void drive(System* system) {
    System* s = system;
    s->array_slope[0]++;
-   h++;
+   s->h++;
 }
 
 int relax(System* system) {
@@ -68,7 +73,7 @@ int relax(System* system) {
                threshold[0] = r < sys->p ? 1 : 2;
                relaxed = 0;
                s++;
-               h--;
+               sys->h--;
             }
             i++;
          }
@@ -104,7 +109,7 @@ int relax(System* system) {
    return s;
 }
 
-void writeFile(int** array, int length, int avalanche) {
+void writeFile(int** array, int length, int states, int avalanche) {
    time_t t = time(NULL);
    struct tm *tm = localtime(&t);
    char s[64];
@@ -122,7 +127,7 @@ void writeFile(int** array, int length, int avalanche) {
       exit(1);
    }
    int i; int j;
-   for (i = 0; i < 7; i++) {
+   for (i = 0; i < states; i++) {
       for (j = 0; j < length; j++) {
          fprintf(f, "%d ", array[i][j]);
       }
@@ -131,39 +136,61 @@ void writeFile(int** array, int length, int avalanche) {
    fclose(f);
 }
 
-void run(System* system, int n, Results* res) {
-   int order = (int)log2(system->L) - 3;
-   for (int i = 0; i < n; i++) {
-      if (i % (n/100) == 0) {
-         printf("%0.0f%%\n", ((float)i/(float)n)*100);
+void* run(void* init) {
+   InitParams* params = (InitParams*)init;
+   int order = (int)log2(params->system.L) - 3;
+   printf("Starting sytem L = %d\n", params->system.L);
+   for (int i = 0; i < params->n; i++) {
+      if (i % (params->n/10) == 0) {
+         printf("%0.0f%%\n", ((float)i/(float)params->n)*100);
       }
-      drive(system);
-      res->avalanches[order][i] = relax(system);
-      res->height[order][i] = h;
+      drive(&params->system);
+      params->res->avalanches[order][i] = relax(&params->system);
+      params->res->height[order][i] = params->system.h;
    }
+   return NULL;
 }
 
 int main(int argc, char** argv) {
    int n = (int)atof(argv[1]);
-   int L[7] = {8,16,32,64,128,256,512};
+   int states = (int)atof(argv[2]);
+
+   /*pthread_t thread[states];
+   pthread_attr_t attr;
+   pthread_attr_init(&attr);
+   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);*/
+
    Results results;
-   results.avalanches = create2DintArray(7, n);
-   results.height = create2DintArray(7, n);
+   results.avalanches = create2DintArray(states, n);
+   results.height = create2DintArray(states, n);
    srand(time(NULL));
-   System* systems = (System*)malloc(7*sizeof(System));
-   for (int i = 0; i < 7; i++) {
-      h = 0;
-      systems[i].L = L[i];
-      systems[i].p = 0.5;
-      systems[i].array_slope = createintArray(systems[i].L);
-      systems[i].array_threshold = generateThresholdArray(systems[i].L, systems[i].p);
-      run(&systems[i], n, &results);
+   InitParams init[states];
+   for (int i = 0; i < states; i++) {
+      int L = (int)pow(2,i+3);
+      System sys;
+      sys.L = L;
+      sys.p = 0.5;
+      sys.h = 0;
+      sys.array_slope = createintArray(L);
+      sys.array_threshold = generateThresholdArray(L, sys.p);
+      init[i].system = sys;
+      init[i].n = n;
+      init[i].res = &results;
    }
+   printf("%s\n", "Running...");
+   //void* status;
+   for (int i = 0; i < states; i++) {
+      //pthread_create(&thread[i], &attr, run, (void*)&init[i]);
+      run((void*)&init[i]);
+   }
+   //for (int i = 0; i < states; i++) {
+   //   pthread_join(thread[i],&status);
+   //}
+   printf("%s\n", "Writing to file...");
+   writeFile(results.height, n, states, 0);
+   writeFile(results.avalanches, n, states, 1);
 
-   writeFile(results.height, n, 0);
-   writeFile(results.avalanches, n, 1);
 
-   free(systems);
    free(results.avalanches);
    free(results.height);
    return 0;
