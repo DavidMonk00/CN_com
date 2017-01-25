@@ -13,6 +13,7 @@ class Height:
         print 'Loading data...'
         self.data = np.loadtxt("./data/"+self.filename)
         self.averaged = False
+        self.collapsed = False
     def average(self,w):
         self.w = w
         print 'Generating moving average...'
@@ -32,6 +33,31 @@ class Height:
             if (self.averaged == False):
                 self.average(25)
             y = self.data_average
+        elif (data == 'collapse'):
+            if (self.collapsed == False):
+                self.datacollapse(-0.52,1.95)
+            y = self.data_collapsed
+            print 'Plotting...'
+            for i in range(len(y)):
+                L = pow(2,i+3)
+                x = self.w*np.arange(1,len(y[0])+1,1)/pow(L,self.D)
+                plt.plot(x,y[i], label='L = %d'%L)
+            plt.xscale('log')
+            plt.yscale('log')
+            plt.ylabel(r'$t^{-\tau_t}F\left(t/L^D\right)$')
+            plt.xlabel(r"$t/L^D$")
+            plt.legend(loc=0)
+            plt.show()
+            return None
+        elif (data == 'mean'):
+            y = self.mean
+            print 'Plotting...'
+            x = np.array([pow(2,i+3) for i in range(len(y))])
+            plt.plot(x,y)
+            plt.xscale('log')
+            plt.yscale('log')
+            plt.show()
+
         print 'Plotting...'
         for i in range(len(y)):
             plt.plot(y[i], label='L = %d'%(pow(2,i+3)))
@@ -39,36 +65,55 @@ class Height:
         plt.yscale('log')
         plt.legend(loc=0)
         plt.show()
-    def datacollapse(self, t, D):
+    def datacollapse(self, tau, D):
+        self.D = D
+        self.tau = tau
         if (self.averaged == False):
                 self.average(25)
         print 'Scaling...'
         l = len(self.data_average[0])
-        y = np.zeros(len(self.data_average)*l).reshape(len(self.data_average),l)
+        self.data_collapsed = np.zeros(len(self.data_average)*l).reshape(len(self.data_average),l)
         for i in range(len(self.data_average)):
             print "%0.0f%%"%(float(i)/(float(len(self.data)))*100)
             for j in xrange(l):
                 if (self.data_average[i][j] != 0):
-                    y[i][j] = pow(j,t)*self.data_average[i][j]
-        for i in range(len(y)):
-            L = pow(2,i+3)
-            x = self.w*np.arange(1,l+1,1)/pow(L,D)
-            plt.plot(x,y[i], label='L = %d'%L)
+                    self.data_collapsed[i][j] = pow(j,tau)*self.data_average[i][j]
+    def averageheight(self):
+        print 'Calculating mean...'
+        mean = []
+        if (self.collapsed == False):
+            D = 1.95
+        else:
+            D = self.D
+        l = len(self.data[0])
+        offset = 100
+        for i in range(len(self.data)):
+            tc = int(pow(pow(2,i+3),D) + offset)
+            print np.mean(self.data[i][tc:]),np.std(self.data[i][tc:])
+            mean.append(np.mean(self.data[i][tc:]))
+        self.mean = np.array(mean)
+    def bindata(self):
+        if (self.collapsed == False):
+            D = 1.95
+        else:
+            D = self.D
+        offset = 0
+        for i in range(len(self.data)):
+            tc = int(pow(pow(2,i+3),D) + offset)
+            bins = np.arange(min(self.data[i][tc:]),max(self.data[i][tc:])+1,1)
+            dat = np.histogram(self.data[i],bins)
+            plt.bar(bins[1:],dat[0])
         plt.xscale('log')
-        plt.yscale('log')
-        plt.ylabel(r'$t^{-\tau_t}F\left(t/L^D\right)$')
-        plt.xlabel(r"$t/L^D$")
-        plt.legend(loc=0)
         plt.show()
-
-
 
 
 def main():
     h = Height()
-    h.average(25)
-    h.datacollapse(-0.52,1.95)
-    #h.plot('average')
+    h.average(10)
+    h.datacollapse(-0.51,1.95)
+    #h.averageheight()
+    #h.bindata()
+    h.plot('collapse')
 
 if (__name__=='__main__'):
     main()
