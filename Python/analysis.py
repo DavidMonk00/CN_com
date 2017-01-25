@@ -129,9 +129,9 @@ class Avalanche:
             bins = np.arange(0,max(self.data[i][tc:])+1,1)
             dat = np.histogram(self.data[i],bins)
             dat = dat[0]/float(len(self.data[i][tc:]))
-            #for j in range(len(bins)-1):
-            #   dat[j] = pow(bins[j],0.25)*dat[j]
-            plt.plot(bins[1:],dat)
+            for j in range(len(bins)-1):
+               dat[j] = pow(bins[j],1.55)*dat[j]
+            plt.plot(bins[1:]/pow(pow(2,i+3),1.95),dat)
         #plt.ylim([1,1.01])
         plt.xscale('log')
         plt.yscale('log')
@@ -141,8 +141,10 @@ class Avalanche:
         offset = 0
         for i in range(len(self.data)):
             tc = int(pow(pow(2,i+3),self.D) + offset)
-            bins, dat = log_bin(self.data[i])
-            plt.plot(bins,dat)
+            bins, dat = log_bin(self.data[i],a=1.75)
+            for j in range(len(bins)):
+              dat[j] = pow(bins[j],1.55)*dat[j]
+            plt.plot(np.array(bins)/pow(pow(2,i+3),1.95),dat)
         print 'Plotting...'
         plt.xscale('log')
         plt.yscale('log')
