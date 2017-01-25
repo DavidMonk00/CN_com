@@ -144,13 +144,11 @@ class Avalanche:
             bins, dat = log_bin(self.data[i],a=1.75)
             for j in range(len(bins)):
               dat[j] = pow(bins[j],1.55)*dat[j]
-            plt.plot(np.array(bins)/pow(pow(2,i+3),1.95),dat)
+            plt.plot(np.array(bins)/pow(pow(2,i+3),2.2),dat)
         print 'Plotting...'
         plt.xscale('log')
         plt.yscale('log')
         plt.show()
-
-
 
 def main():
     '''h = Height()
