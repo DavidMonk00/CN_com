@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import csv
 import sys
+from log_bin_CN_2016 import log_bin
 
 class Height:
     def __init__(self):
@@ -89,7 +90,7 @@ class Height:
         offset = 100
         for i in range(len(self.data)):
             tc = int(pow(pow(2,i+3),D) + offset)
-            print np.mean(self.data[i][tc:]),np.std(self.data[i][tc:])
+            #print np.mean(self.data[i][tc:]),np.std(self.data[i][tc:])
             mean.append(np.mean(self.data[i][tc:]))
         self.mean = np.array(mean)
     def bindata(self):
@@ -102,18 +103,62 @@ class Height:
             tc = int(pow(pow(2,i+3),D) + offset)
             bins = np.arange(min(self.data[i][tc:]),max(self.data[i][tc:])+1,1)
             dat = np.histogram(self.data[i],bins)
-            plt.bar(bins[1:],dat[0])
+            dat = dat[0]/float(len(self.data[i][tc:]))
+            for j in range(len(bins)-1):
+                dat[j] = pow(bins[j],0.25)*dat[j]
+            plt.plot(bins[1:]/pow(self.mean[i],1),dat)
+        #plt.ylim([1,1.01])
         plt.xscale('log')
+        plt.yscale('log')
+        plt.show()
+
+class Avalanche:
+    D = 1.95
+    def __init__(self):
+        f = [file for file in os.listdir("./data/") if file.endswith("avalanche.dat")]
+        f.sort()
+        self.filename = f[-1]
+        print 'Loading data...'
+        self.data = np.loadtxt("./data/"+self.filename)
+        self.averaged = False
+        self.collapsed = False
+    def probability(self):
+        offset = 0
+        for i in range(len(self.data)):
+            tc = int(pow(pow(2,i+3),self.D) + offset)
+            bins = np.arange(0,max(self.data[i][tc:])+1,1)
+            dat = np.histogram(self.data[i],bins)
+            dat = dat[0]/float(len(self.data[i][tc:]))
+            #for j in range(len(bins)-1):
+            #   dat[j] = pow(bins[j],0.25)*dat[j]
+            plt.plot(bins[1:],dat)
+        #plt.ylim([1,1.01])
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.show()
+    def logBin(self):
+        print 'Binning data...'
+        offset = 0
+        for i in range(len(self.data)):
+            tc = int(pow(pow(2,i+3),self.D) + offset)
+            bins, dat = log_bin(self.data[i])
+            plt.plot(bins,dat)
+        print 'Plotting...'
+        plt.xscale('log')
+        plt.yscale('log')
         plt.show()
 
 
+
 def main():
-    h = Height()
-    h.average(10)
-    h.datacollapse(-0.51,1.95)
-    #h.averageheight()
-    #h.bindata()
-    h.plot('collapse')
+    '''h = Height()
+    #h.average(10)
+    #h.datacollapse(-0.51,1.95)
+    h.averageheight()
+    h.bindata()
+    #h.plot('collapse')'''
+    a = Avalanche()
+    a.logBin()
 
 if (__name__=='__main__'):
     main()
