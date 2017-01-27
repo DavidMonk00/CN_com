@@ -51,19 +51,29 @@ class Height:
             plt.show()
             return None
         elif (data == 'mean'):
+            self.averageheight()
             y = self.mean
             print 'Plotting...'
             x = np.array([pow(2,i+3) for i in range(len(y))])
-            plt.plot(x,y)
-            plt.xscale('log')
-            plt.yscale('log')
+            plt.plot(x,y, marker='o',linestyle='--')
+            plt.xlabel('L')
+            plt.ylabel('Mean Recurrent Height')
+            #plt.xscale('log')
+            #plt.yscale('log')
             plt.show()
+            return None
 
         print 'Plotting...'
+        if (data == 'average'):
+            x = self.w*np.arange(0,len(y[0]),1)
+        else:
+            x = np.arange(0,len(y[0]),1)
         for i in range(len(y)):
-            plt.plot(y[i], label='L = %d'%(pow(2,i+3)))
+            plt.plot(x,y[i], label='L = %d'%(pow(2,i+3)))
         plt.xscale('log')
         plt.yscale('log')
+        plt.ylabel('Height')
+        plt.xlabel('t')
         plt.legend(loc=0)
         plt.show()
     def datacollapse(self, tau, D):
@@ -107,7 +117,6 @@ class Height:
             for j in range(len(bins)-1):
                 dat[j] = pow(bins[j],0.25)*dat[j]
             plt.plot(bins[1:]/pow(self.mean[i],1),dat)
-        #plt.ylim([1,1.01])
         plt.xscale('log')
         plt.yscale('log')
         plt.show()
@@ -151,14 +160,14 @@ class Avalanche:
         plt.show()
 
 def main():
-    '''h = Height()
-    #h.average(10)
+    h = Height()
+    h.average(25)
     #h.datacollapse(-0.51,1.95)
-    h.averageheight()
-    h.bindata()
-    #h.plot('collapse')'''
-    a = Avalanche()
-    a.logBin()
+    #h.averageheight()
+    #h.bindata()
+    h.plot('mean')
+    #a = Avalanche()
+    #a.logBin()
 
 if (__name__=='__main__'):
     main()
