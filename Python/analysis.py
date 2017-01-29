@@ -160,14 +160,14 @@ class Avalanche:
         plt.show()
 
 def main():
-    h = Height()
-    h.average(25)
+    #h = Height()
+    #h.average(25)
     #h.datacollapse(-0.51,1.95)
     #h.averageheight()
     #h.bindata()
-    h.plot('mean')
-    #a = Avalanche()
-    #a.logBin()
+    #h.plot('mean')
+    a = Avalanche()
+    a.logBin()
 
 if (__name__=='__main__'):
     main()
