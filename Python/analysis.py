@@ -96,7 +96,6 @@ class Height:
             D = 1.95
         else:
             D = self.D
-        l = len(self.data[0])
         offset = 100
         for i in range(len(self.data)):
             tc = int(pow(pow(2,i+3),D) + offset)
@@ -122,7 +121,7 @@ class Height:
         plt.show()
 
 class Avalanche:
-    D = 1.95
+    D = 2.2
     def __init__(self):
         f = [file for file in os.listdir("./data/") if file.endswith("avalanche.dat")]
         f.sort()
@@ -158,6 +157,25 @@ class Avalanche:
         plt.xscale('log')
         plt.yscale('log')
         plt.show()
+    def moment(self):
+        means = []
+        offset = 100
+        for i in range(1,6):
+            mean = []
+            for j in range(len(self.data)):
+                tc = int(pow(pow(2,j+3),self.D) + offset)
+                mean.append(np.mean(np.power(self.data[j][tc:],i)))
+            x = np.array([pow(2,j+3) for j in range(len(self.data))])
+            plt.plot(x,np.array(mean), marker='o', label='k = %d'%i)
+            means.append(mean)
+        means =np.transpose(np.array(means))
+        np.savetxt('./data/'+self.filename[:-4]+'_averaged.dat',means)
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.legend(loc=0)
+        plt.xlabel(r'$L$', fontsize=18)
+        plt.ylabel(r'$\langle s^{k} \rangle$', fontsize=18)
+        plt.show()
 
 def main():
     #h = Height()
@@ -167,7 +185,7 @@ def main():
     #h.bindata()
     #h.plot('mean')
     a = Avalanche()
-    a.logBin()
+    a.moment()
 
 if (__name__=='__main__'):
     main()
