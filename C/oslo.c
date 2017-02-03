@@ -92,15 +92,17 @@ int relax(System* system) {
 }
 
 void writeFile(int** array, int length, int states, int avalanche) {
+   int l = (int)log10((double)length);
+   int x = length/pow(10,l);
    time_t t = time(NULL);
    struct tm *tm = localtime(&t);
    char s[64];
    strftime(s, sizeof(s), "./data/%Y%m%d%H%M%S", tm);
    char ext[64];
    if (avalanche) {
-      sprintf(ext, "_avalanche.dat");
+      sprintf(ext, "_%de%d_%d_avalanche.dat", x,l, states);
    } else {
-      sprintf(ext, "_height.dat");
+      sprintf(ext, "_%de%d_%d_height.dat", x,l, states);
    }
    strcat(s,ext);
    FILE* f = fopen(s, "w");
@@ -130,6 +132,7 @@ void* run(void* init) {
       params->res->avalanches[order][i] = relax(&params->system);
       params->res->height[order][i] = params->system.h;
    }
+   printf("100%%\n");
    return NULL;
 }
 
