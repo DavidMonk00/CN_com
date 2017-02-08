@@ -46,7 +46,7 @@ int relax(System* system) {
    while (!relaxed) {
       relaxed = 1;
       int i = 0;
-      while (i < sys->L) {
+      while (i < L) {
          if (i == 0){
             if (slope[0] > threshold[0]){
                slope[0] = slope[0] - 2;

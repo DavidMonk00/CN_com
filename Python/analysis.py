@@ -72,8 +72,9 @@ class Height:
             plt.plot(x,y[i], label='L = %d'%(pow(2,i+3)))
         plt.xscale('log')
         plt.yscale('log')
-        plt.ylabel('Height')
-        plt.xlabel('t')
+        plt.title(r'Oslo model', fontsize=18)
+        plt.ylabel(r'$Height$', fontsize=18)
+        plt.xlabel(r'$t$', fontsize=18)
         plt.legend(loc=0)
         plt.show()
     def datacollapse(self, tau, D):
@@ -178,14 +179,14 @@ class Avalanche:
         plt.show()
 
 def main():
-    #h = Height()
-    #h.average(25)
+    h = Height()
+    h.average(25)
     #h.datacollapse(-0.51,1.95)
     #h.averageheight()
     #h.bindata()
-    #h.plot('mean')
-    a = Avalanche()
-    a.moment()
+    h.plot('averaged')
+    #a = Avalanche()
+    #a.moment()
 
 if (__name__=='__main__'):
     main()
