@@ -5,30 +5,9 @@
 #include <math.h>
 #include <pthread.h>
 #include "structs.h"
+#include "backgroundfunctions.h"
 
-int* createintArray(int length) {
-   int* array;
-   array = (int*)malloc(length*sizeof(int));
-   return array;
-}
-
-int** create2DintArray(int rows, int columns) {
-   int** array;
-   array = (int**)malloc(rows*sizeof(int*));
-   for (int i = 0; i < rows; i++) {
-      array[i] = (int*)malloc(columns*sizeof(int));
-   }
-   return array;
-}
-
-int* generateThresholdArray(int length, float probability) {
-   int* array = createintArray(length);
-   for (int i = 0; i < length; i++) {
-         float r = (float)rand()/(float)RAND_MAX;
-         array[i] = r < probability ? 1 : 2;
-   }
-   return array;
-}
+int fallen = 0;
 
 void drive(System* system) {
    System* s = system;
@@ -68,6 +47,9 @@ int relax(System* system) {
                relaxed = 0;
                s++;
                i--;
+               if (fallen == 0) {
+                  fallen = 1;
+               }
             } else {
                i++;
             }
@@ -121,6 +103,7 @@ void writeFile(int** array, int length, int states, int avalanche) {
 }
 
 void* run(void* init) {
+   fallen = 0;
    InitParams* params = (InitParams*)init;
    int order = (int)log2(params->system.L) - 3;
    printf("Starting sytem L = %d\n", params->system.L);
@@ -130,6 +113,11 @@ void* run(void* init) {
       }
       drive(&params->system);
       params->res->avalanches[order][i] = relax(&params->system);
+      if (fallen == 1) {
+         printf("First grain fell at: %d\n", i);
+         fallen++;
+         //break;
+      }
       params->res->height[order][i] = params->system.h;
    }
    printf("100%%\n");

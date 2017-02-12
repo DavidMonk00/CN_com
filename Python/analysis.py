@@ -12,7 +12,8 @@ class Height:
         f.sort()
         self.filename = f[-1]
         print 'Loading data...'
-        self.data = np.loadtxt("./data/"+self.filename)
+        self.data = np.loadtxt("./data/"+self.filename, dtype=int)
+        self.tc = np.loadtxt("temp",dtype=int)
         self.averaged = False
         self.collapsed = False
     def average(self,w):
@@ -36,7 +37,7 @@ class Height:
             y = self.data_average
         elif (data == 'collapse'):
             if (self.collapsed == False):
-                self.datacollapse(-0.52,1.95)
+                self.datacollapse(-0.51,1.95)
             y = self.data_collapsed
             print 'Plotting...'
             for i in range(len(y)):
@@ -45,6 +46,7 @@ class Height:
                 plt.plot(x,y[i], label='L = %d'%L)
             plt.xscale('log')
             plt.yscale('log')
+            plt.title(r'Scaled transient data of the Oslo model', fontsize=18)
             plt.ylabel(r'$t^{-\tau_t}F\left(t/L^D\right)$')
             plt.xlabel(r"$t/L^D$")
             plt.legend(loc=0)
@@ -55,14 +57,13 @@ class Height:
             y = self.mean
             print 'Plotting...'
             x = np.array([pow(2,i+3) for i in range(len(y))])
-            plt.plot(x,y, marker='o',linestyle='--')
-            plt.xlabel('L')
-            plt.ylabel('Mean Recurrent Height')
+            plt.errorbar(x,y, yerr=self.std, marker='o',linestyle='--')
+            plt.xlabel(r'$L$',fontsize=18)
+            plt.ylabel('Mean Recurrent Height',fontsize=12)
             #plt.xscale('log')
             #plt.yscale('log')
             plt.show()
             return None
-
         print 'Plotting...'
         if (data == 'average'):
             x = self.w*np.arange(0,len(y[0]),1)
@@ -93,16 +94,18 @@ class Height:
     def averageheight(self):
         print 'Calculating mean...'
         mean = []
+        std = []
         if (self.collapsed == False):
             D = 1.95
         else:
             D = self.D
         offset = 100
         for i in range(len(self.data)):
-            tc = int(pow(pow(2,i+3),D) + offset)
-            #print np.mean(self.data[i][tc:]),np.std(self.data[i][tc:])
-            mean.append(np.mean(self.data[i][tc:]))
+            mean.append(np.mean(self.data[i][self.tc[i]:]))
+            std.append(np.std(self.data[i][self.tc[i]:]))
+            print np.std(self.data[i][self.tc[i]:])
         self.mean = np.array(mean)
+        self.std = np.array(std)
     def bindata(self):
         if (self.collapsed == False):
             D = 1.95
@@ -110,15 +113,18 @@ class Height:
             D = self.D
         offset = 0
         for i in range(len(self.data)):
-            tc = int(pow(pow(2,i+3),D) + offset)
-            bins = np.arange(min(self.data[i][tc:]),max(self.data[i][tc:])+1,1)
+            bins = np.arange(min(self.data[i][self.tc[i]:]),max(self.data[i][self.tc[i]:])+1,1)
             dat = np.histogram(self.data[i],bins)
-            dat = dat[0]/float(len(self.data[i][tc:]))
+            dat = dat[0]/float(len(self.data[i][self.tc[i]:]))
             for j in range(len(bins)-1):
-                dat[j] = pow(bins[j],0.25)*dat[j]
-            plt.plot(bins[1:]/pow(self.mean[i],1),dat)
-        plt.xscale('log')
+                dat[j] = dat[j]*self.std[i]
+            plt.plot((bins[1:]-self.mean[i])/self.std[i],dat,label='L = %d'%(pow(2,i+3)))
+        #plt.xscale('log')
         plt.yscale('log')
+        plt.xlim(-8,8)
+        plt.legend(loc=0)
+        plt.xlabel(r'$\left( x - \langle x \rangle _{n} \right)/\sigma _{n}$', fontsize=18)
+        plt.ylabel(r'$\sigma _{n} P\left( x \right)$', fontsize=18)
         plt.show()
 
 class Avalanche:
@@ -129,15 +135,15 @@ class Avalanche:
         self.filename = f[-1]
         print 'Loading data...'
         self.data = np.loadtxt("./data/"+self.filename)
+        self.tc = np.loadtxt("temp",dtype=int)
         self.averaged = False
         self.collapsed = False
     def probability(self):
         offset = 0
         for i in range(len(self.data)):
-            tc = int(pow(pow(2,i+3),self.D) + offset)
-            bins = np.arange(0,max(self.data[i][tc:])+1,1)
+            bins = np.arange(0,max(self.data[i][self.tc[i]:])+1,1)
             dat = np.histogram(self.data[i],bins)
-            dat = dat[0]/float(len(self.data[i][tc:]))
+            dat = dat[0]/float(len(self.data[i][self.tc[i]:]))
             for j in range(len(bins)-1):
                dat[j] = pow(bins[j],1.55)*dat[j]
             plt.plot(bins[1:]/pow(pow(2,i+3),1.95),dat)
@@ -149,7 +155,6 @@ class Avalanche:
         print 'Binning data...'
         offset = 0
         for i in range(len(self.data)):
-            tc = int(pow(pow(2,i+3),self.D) + offset)
             bins, dat = log_bin(self.data[i],a=1.75)
             for j in range(len(bins)):
               dat[j] = pow(bins[j],1.55)*dat[j]
@@ -164,8 +169,7 @@ class Avalanche:
         for i in range(1,6):
             mean = []
             for j in range(len(self.data)):
-                tc = int(pow(pow(2,j+3),self.D) + offset)
-                mean.append(np.mean(np.power(self.data[j][tc:],i)))
+                mean.append(np.mean(np.power(self.data[j][self.tc[i]:],i)))
             x = np.array([pow(2,j+3) for j in range(len(self.data))])
             plt.plot(x,np.array(mean), marker='o', label='k = %d'%i)
             means.append(mean)
@@ -180,11 +184,11 @@ class Avalanche:
 
 def main():
     h = Height()
-    h.average(25)
+    #h.average(25)
     #h.datacollapse(-0.51,1.95)
-    #h.averageheight()
-    #h.bindata()
-    h.plot('averaged')
+    h.averageheight()
+    h.bindata()
+    #h.plot('mean')
     #a = Avalanche()
     #a.moment()
 
