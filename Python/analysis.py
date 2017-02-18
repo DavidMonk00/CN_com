@@ -103,16 +103,16 @@ class Height:
         self.mean = np.array(mean)
         self.std = np.array(std)
     def bindata(self):
-        a = [1.72715,pow(np.e,-0.271)]
+        a = [1.72715,pow(10,-0.271)]
         w1 = -0.919
         for i in range(len(self.data)):
             bins = np.arange(min(self.data[i][self.tc[i]:]),max(self.data[i][self.tc[i]:])+1,1)
             dat = np.histogram(self.data[i],bins)
             dat = dat[0]/float(len(self.data[i][self.tc[i]:]))
-            for j in range(len(bins)-1):
-                dat[j] = dat[j]*self.std[i]
             L = pow(2,i+3)
-            plt.plot((bins[1:]-a[0]*L*(1-a[1]*pow(L,w1)))/self.std[i],dat,label='L = %d'%(pow(2,i+3)))
+            for j in range(len(bins)-1):
+                dat[j] = dat[j]*(0.59265*pow(L,0.2390))
+            plt.plot((bins[1:]-a[0]*L*(1-a[1]*pow(L,w1)))/(0.59265*pow(L,0.2390)),dat,label='L = %d'%(pow(2,i+3)))
         #plt.xscale('log')
         plt.yscale('log')
         plt.xlim(-8,8)
