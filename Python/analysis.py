@@ -135,9 +135,9 @@ class Avalanche:
     def probability(self):
         offset = 0
         for i in range(1):#len(self.data)):
-            bins = np.arange(0,max(self.data[5][self.tc[5]:])+1,1)
-            dat = np.histogram(self.data[5][self.tc[5]:],bins)
-            dat = dat[0]/float(len(self.data[5][self.tc[5]:]))
+            bins = np.arange(0,max(self.data[-1][self.tc[-1]:])+1,1)
+            dat = np.histogram(self.data[-1][self.tc[-1]:],bins)
+            dat = dat[0]/float(len(self.data[-1][self.tc[-1]:]))
             for j in range(len(bins)-1):
                #dat[j] = pow(bins[j],1.55)*dat[j]
                pass
@@ -150,7 +150,7 @@ class Avalanche:
         print 'Binning data...'
         offset = 0
         for i in range(1):#len(self.data)):
-            bins, dat = log_bin(self.data[5],a=1.75)
+            bins, dat = log_bin(self.data[-1],a=1.75)
             for j in range(len(bins)):
               #dat[j] = pow(bins[j],1.55)*dat[j]
               pass
@@ -181,15 +181,15 @@ class Avalanche:
         plt.show()
 
 def main():
-    h = Height()
+    #h = Height()
     #h.average(25)
     #h.datacollapse(-0.51,1.95)
-    h.averageheight()
-    h.bindata()
+    #h.averageheight()
+    #h.bindata()
     #h.plot('collapse')
-    #a = Avalanche()
-    #a.probability()
-    #a.logBin()
+    a = Avalanche()
+    a.probability()
+    a.logBin()
     #a.moment()
 
 if (__name__=='__main__'):
