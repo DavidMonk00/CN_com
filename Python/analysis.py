@@ -164,10 +164,10 @@ class Avalanche:
     def moment(self):
         means = []
         offset = 100
-        for i in range(1,6):
+        for i in range(1,7):
             mean = []
             for j in range(len(self.data)):
-                mean.append(np.mean(np.power(self.data[j][self.tc[i]:],i)))
+                mean.append(np.mean(np.power(self.data[j][self.tc[i]:],i, dtype='float128')))
             x = np.array([pow(2,j+3) for j in range(len(self.data))])
             plt.plot(x,np.array(mean), marker='o', label='k = %d'%i)
             means.append(mean)
@@ -189,8 +189,8 @@ def main():
     #h.plot('collapse')
     a = Avalanche()
     #a.probability()
-    a.logBin()
-    #a.moment()
+    #a.logBin()
+    a.moment()
 
 if (__name__=='__main__'):
     main()
