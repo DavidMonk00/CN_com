@@ -133,14 +133,14 @@ class Avalanche:
         self.averaged = False
         self.collapsed = False
     def probability(self):
-        for i in range(1):#len(self.data)):
-            bins = np.arange(0,max(self.data[-1][self.tc[-1]:])+1,1)
-            dat = np.histogram(self.data[-1][self.tc[-1]:],bins)
-            dat = dat[0]/float(len(self.data[-1][self.tc[-1]:]))
+        for i in range(len(self.data)):
+            bins = np.arange(0,max(self.data[i][self.tc[i]:])+1,1)
+            dat = np.histogram(self.data[i][self.tc[i]:],bins)
+            dat = dat[0]/float(len(self.data[i][self.tc[i]:]))
             for j in range(len(bins)-1):
                #dat[j] = pow(bins[j],1.55)*dat[j]
                pass
-            plt.scatter(bins[1:],dat,lw=0,color='green')#/pow(pow(2,i+3),1.95),dat)
+            #plt.scatter(bins[1:],dat,lw=0,color='green')#/pow(pow(2,i+3),1.95),dat)
         #plt.ylim([1,1.01])
         plt.xscale('log')
         plt.yscale('log')
@@ -148,14 +148,15 @@ class Avalanche:
     def logBin(self):
         print 'Binning data...'
         offset = 0
-        for i in range(1):#len(self.data)):
-            bins, dat = log_bin(self.data[-1],a=1.25)
+        for i in range(len(self.data)):
+            bins, dat = log_bin(self.data[i],a=1.25)
             for j in range(len(bins)):
               #dat[j] = pow(bins[j],1.55)*dat[j]
               pass
-            plt.plot(np.array(bins),dat, lw = 2.5)#/pow(pow(2,i+3),2.2),dat)
+            plt.plot(np.array(bins),dat,label='L = %d'%(pow(2,i+3)))#/pow(pow(2,i+3),2.2),dat)
         print 'Plotting...'
-        plt.ylabel(r'$P_{10^{7}} \left( s; 1024 \right)$',fontsize=18)
+        plt.legend(loc=0)
+        plt.ylabel(r'$P_{10^{7}} \left( s; L \right)$',fontsize=18)
         plt.xlabel(r'$s$',fontsize=18)
         plt.xscale('log')
         plt.yscale('log')

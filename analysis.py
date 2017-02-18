@@ -149,7 +149,7 @@ class Avalanche:
         print 'Binning data...'
         offset = 0
         for i in range(1):#len(self.data)):
-            bins, dat = log_bin(self.data[-1],a=1.25)
+            bins, dat = log_bin(self.data[-1],a=1.1)
             for j in range(len(bins)):
               #dat[j] = pow(bins[j],1.55)*dat[j]
               pass
