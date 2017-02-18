@@ -171,7 +171,7 @@ class Avalanche:
             x = np.array([pow(2,j+3) for j in range(len(self.data))])
             plt.plot(x,np.array(mean), marker='o', label='k = %d'%i)
             means.append(mean)
-        means =np.transpose(np.array(means))
+        means = np.transpose(np.array(means))
         np.savetxt('./data/'+self.filename[:-4]+'_averaged.dat',means)
         plt.xscale('log')
         plt.yscale('log')
