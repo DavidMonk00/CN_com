@@ -117,8 +117,8 @@ class Height:
         plt.yscale('log')
         plt.xlim(-8,8)
         plt.legend(loc=0)
-        plt.xlabel(r'$\left( x - a _{0} L \left( 1 - a_{1} L^{\omega_{1}} \right) \right)/\sigma _{n}$', fontsize=18)
-        plt.ylabel(r'$\sigma _{n} P\left( x \right)$', fontsize=18)
+        plt.xlabel(r'$\left( h - a _{0} L \left( 1 - a_{1} L^{\omega_{1}} \right) \right)/\sigma _{L}$', fontsize=18)
+        plt.ylabel(r'$\sigma _{L} P\left( h \right)$', fontsize=18)
         plt.show()
 
 class Avalanche:
@@ -181,15 +181,15 @@ class Avalanche:
         plt.show()
 
 def main():
-    #h = Height()
+    h = Height()
     #h.average(25)
     #h.datacollapse(-0.51,1.95)
-    #h.averageheight()
-    #h.bindata()
+    h.averageheight()
+    h.bindata()
     #h.plot('collapse')
-    a = Avalanche()
-    a.probability()
-    a.logBin()
+    #a = Avalanche()
+    #a.probability()
+    #a.logBin()
     #a.moment()
 
 if (__name__=='__main__'):

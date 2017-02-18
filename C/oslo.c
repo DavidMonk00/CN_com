@@ -114,7 +114,7 @@ void* run(void* init) {
       drive(&params->system);
       params->res->avalanches[order][i] = relax(&params->system);
       if (fallen == 1) {
-         printf("First grain fell at: %d\n", i);
+         printf("First grain fell at: %d height was: %d\n", i, params->system.h);
          fallen++;
          //break;
       }
