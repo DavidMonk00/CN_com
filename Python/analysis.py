@@ -151,9 +151,9 @@ class Avalanche:
         for i in range(len(self.data)):
             bins, dat = log_bin(self.data[i],a=1.25)
             for j in range(len(bins)):
-              #dat[j] = pow(bins[j],1.55)*dat[j]
+              dat[j] = pow(bins[j],1.55)*dat[j]
               pass
-            plt.plot(np.array(bins),dat,label='L = %d'%(pow(2,i+3)))#/pow(pow(2,i+3),2.2),dat)
+            plt.plot(np.array(bins)/pow(pow(2,i+3),2.25),dat,label='L = %d'%(pow(2,i+3)))
         print 'Plotting...'
         plt.legend(loc=0)
         plt.ylabel(r'$P_{10^{7}} \left( s; L \right)$',fontsize=18)
@@ -188,7 +188,7 @@ def main():
     #h.bindata()
     #h.plot('collapse')
     a = Avalanche()
-    a.probability()
+    #a.probability()
     a.logBin()
     #a.moment()
 
